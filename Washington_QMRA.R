@@ -1,27 +1,25 @@
 organism<-"E.coli"
 source("Washington_parameter.R")
 
-#Scenario 1. touching wet laundry to put it into dryer 
+#Scenario 1. touching wet laundry to put it into dryer (baseline, using china standard)-------------------
 numevents<-2
 eventsname<-c("Washer to dryer","Hand to face touch")
 
-Conc.h<-matrix(nrow=numevents,ncol=iterations)
-rownames(Conc.h)<-eventsname
+Conc.h.b<-matrix(nrow=numevents,ncol=iterations)
+rownames(Conc.h.b)<-eventsname
 
-Conc.l<-matrix(nrow=numevents, ncol=iterations)
-rownames(Conc.l)<-eventsname
+Conc.l.b<-matrix(nrow=numevents, ncol=iterations)
+rownames(Conc.l.b)<-eventsname
 
-Dose<-matrix(nrow=numevents, ncol=iterations)
-rownames(Dose)<-eventsname
+Dose.b<-matrix(nrow=numevents, ncol=iterations)
+rownames(Dose.b)<-eventsname
 
-Risk<-matrix(nrow=numevents, ncol=iterations)
-rownames(Risk)<-eventsname
+Risk.b<-matrix(nrow=numevents, ncol=iterations)
+rownames(Risk.b)<-eventsname
 
-##Baseline scenario -----------------------------------------------------------------
-
-#Event 1. Loading washed clothes to dryer
+##Event 1. Loading washed clothes to dryer
 Conc.h.current<-0
-Conc.l.current<-Conc.i.laundry
+Conc.l.current<-Conc.i.laundry/10^(Reduc.wash.c)
 
 for (i in 1:n.HL.wet) {
   Conc.h.current<-Conc.h.current-{TE.wet*Frac.HS*(Conc.h.current-Conc.l.current)}
@@ -29,54 +27,76 @@ for (i in 1:n.HL.wet) {
 }
 
 
-Conc.h[1,]<- Conc.h.current
-Conc.l[1,]<- Conc.l.current
-Dose[1,]<-0
-Risk[4,]<-0
+Conc.h.b[1,]<- Conc.h.current
+Conc.l.b[1,]<- Conc.l.current
+Dose.b[1,]<-0
+Risk.b[1,]<-0
 
-#Event 2. Hand to face contact 
+##Event 2. Hand to face contact 
 n.HF.wet<-n.HM.wet
 
-Conc.h.current<-Conc.h[1,]
-Dose<-Dose[1,]
+Conc.h.current<-Conc.h.b[1,]
+Dose<-Dose.b[1,]
 
 for (i in 1:n.HF.wet){
   Conc.h.current <-(1-TE.face*Frac.HF)*(Conc.h.current)
   Dose<-Dose+(Conc.h.current*TE.face*Frac.HF*A.hand)
 }
 
+Conc.h.b[2,]<- Conc.h.current
+Conc.l.b[2,]<-Conc.l.b[1,]
+Dose.b[2,]<-Dose
+Risk.b[2,]<-1-(1+(Dose.b[2,]/beta))^(-alpha)
+
+#Scenario 2. touching wet laundry to put it into dryer (Using White)-------------------
+numevents<-2
+eventsname<-c("Washer to dryer","Hand to face touch")
+
+Conc.h.i<-matrix(nrow=numevents,ncol=iterations)
+rownames(Conc.h.i)<-eventsname
+
+Conc.l.i<-matrix(nrow=numevents, ncol=iterations)
+rownames(Conc.l.i)<-eventsname
+
+Dose.i<-matrix(nrow=numevents, ncol=iterations)
+rownames(Dose.i)<-eventsname
+
+Risk.i<-matrix(nrow=numevents, ncol=iterations)
+rownames(Risk.i)<-eventsname
+
+##Event 1. Loading washed clothes to dryer
+Conc.h.current<-0
+Conc.l.current<-Conc.i.laundry/10^(Reduc.wash)
+
+for (i in 1:n.HL.wet) {
+  Conc.h.current<-Conc.h.current-{TE.wet*Frac.HS*(Conc.h.current-Conc.l.current)}
+  Conc.l.current<-Conc.l.current-{TE.wet*Frac.HS*A.hand/A.laundry*(Conc.l.current-Conc.h.current)}
+}
 
 
+Conc.h.i[1,]<- Conc.h.current
+Conc.l.i[1,]<- Conc.l.current
+Dose.i[1,]<-0
+Risk.i[1,]<-0
 
-Conc.h[5,]<-(1-TE.face*Frac.HF)*(Conc.h[4,]*exp(-Inact.h*Contact.time.face.d))
-Conc.l[2,]<-Conc.l[1,]
-Dose[5,]<-Dose[4,]+(Conc.h[4,]*exp(-Inact.h*Contact.time.face.d)*TE.face*Frac.HF*A.hand)
-Risk[5,]<- 1-(1+(Dose[5,]/beta))^(-alpha)
+##Event 2. Hand to face contact 
+n.HF.wet<-n.HM.wet
 
-#Event 6. Drying Laundry 
-Conc.h[6,]<-Conc.h[5,]*exp(-Inact.h*(Dur.dry-Contact.time.face.d))
-Conc.l[6,]<-Conc.l[5,]/10^(Reduc.dry*(Dur.dry-Contact.time.face.d)/Dur.dry)
-Dose[6,]<-Dose[5,]
-Risk[6,]<-Risk[5,]
+Conc.h.current<-Conc.h.i[1,]
+Dose<-Dose.i[1,]
 
-#Event 7. Dryer to folding area 
-Conc.h[7,]<-Conc.h[6,]*exp(-Inact.h*Contact.time.laundry)-{TE.dry*Frac.HS*
-    (Conc.h[6,]*exp(-Inact.h*Contact.time.laundry)-Conc.l[6,]*exp(-Inact.s*Contact.time.laundry))}
-Conc.l[7,]<-Conc.l[6,]*exp(-Inact.s*Contact.time.laundry)-{TE.dry*Frac.HS*
-    A.hand/Surface.area.laundry*(Conc.l[6,]*exp(-Inact.s*Contact.time.laundry)-Conc.h[6,]
-                                     *(exp(-Inact.h*Contact.time.laundry)))}
-Dose[7,]<-Dose[6,]
-Risk[7,]<-Risk[6,]
+for (i in 1:n.HF.wet){
+  Conc.h.current <-(1-TE.face*Frac.HF)*(Conc.h.current)
+  Dose<-Dose+(Conc.h.current*TE.face*Frac.HF*A.hand)
+}
 
-#Event 8. Hand to face Contact #3
-
-Conc.h[8,]<-(1-TE.face*Frac.HF)*(Conc.h[7,]*exp(-Inact.h*Contact.time.face.f))
-Conc.l[8,]<-Conc.l[7,]*exp(-Inact.s*Contact.time.face.f)
-Dose[8,]<-Dose[7,]+(Conc.h[7,]*exp(-Inact.h*Contact.time.face.f)*TE.face*Frac.HF*A.hand)
-Risk[8,]<- 1-(1+(Dose[8,]/beta))^(-alpha)
+Conc.h.i[2,]<- Conc.h.current
+Conc.l.i[2,]<-Conc.l.i[1,]
+Dose.i[2,]<-Dose
+Risk.i[2,]<-1-(1+(Dose.i[2,]/beta))^(-alpha)
 
 
-#plotting
+#plotting--------need to update
 library(ggplot2)
 library(ggpubr)
 
@@ -115,7 +135,123 @@ ggplot(data)+geom_violin(aes(x=event,y=value,fill=type, group=event),alpha=0.3,d
   facet_wrap(~type,scales="free") +
   scale_y_continuous(trans="log10")
 
+#Result pulling -------------------------------------
 
+#Conc.h
+matrix.Conc.h<-matrix(nrow=numevents*2, ncol=5)
+colnames(matrix.Conc.h)<-c('mean', 'sd', 'min', 'max','median')
+rownames(matrix.Conc.h)<-c('washer to dryer.b','hand to face touch.b','washer to dryer.i','hand to face touch.i')
+
+
+for (f in 1:2){
+  matrix.Conc.h[f,1]<-mean(Conc.h.b[f,])
+  matrix.Conc.h[f,2]<-sd(Conc.h.b[f,])
+  matrix.Conc.h[f,3]<-min(Conc.h.b[f,])
+  matrix.Conc.h[f,4]<-max(Conc.h.b[f,])
+  matrix.Conc.h[f,5]<-median(Conc.h.b[f,])
+}
+
+for (f in 1:2){
+  matrix.Conc.h[f+2,1]<-mean(Conc.h.i[f,])
+  matrix.Conc.h[f+2,2]<-sd(Conc.h.i[f,])
+  matrix.Conc.h[f+2,3]<-min(Conc.h.i[f,])
+  matrix.Conc.h[f+2,4]<-max(Conc.h.i[f,])
+  matrix.Conc.h[f+2,5]<-median(Conc.h.i[f,])
+}
+
+#Conc.l
+
+matrix.Conc.l<-matrix(nrow=numevents*2, ncol=5)
+colnames(matrix.Conc.l)<-c('mean', 'sd', 'min', 'max','median')
+rownames(matrix.Conc.l)<-c('washer to dryer.b','hand to face touch.b','washer to dryer.i','hand to face touch.i')
+
+
+for (f in 1:2){
+  matrix.Conc.l[f,1]<-mean(Conc.l.b[f,])
+  matrix.Conc.l[f,2]<-sd(Conc.l.b[f,])
+  matrix.Conc.l[f,3]<-min(Conc.l.b[f,])
+  matrix.Conc.l[f,4]<-max(Conc.l.b[f,])
+  matrix.Conc.l[f,5]<-median(Conc.l.b[f,])
+}
+
+for (f in 1:2){
+  matrix.Conc.l[f+2,1]<-mean(Conc.l.i[f,])
+  matrix.Conc.l[f+2,2]<-sd(Conc.l.i[f,])
+  matrix.Conc.l[f+2,3]<-min(Conc.l.i[f,])
+  matrix.Conc.l[f+2,4]<-max(Conc.l.i[f,])
+  matrix.Conc.l[f+2,5]<-median(Conc.l.i[f,])
+}
+
+#Dose
+matrix.Dose<-matrix(nrow=numevents*2, ncol=5)
+colnames(matrix.Dose)<-c('mean', 'sd', 'min', 'max', 'median')
+rownames(matrix.Dose)<-c('washer to dryer.b','hand to face touch.b','washer to dryer.i','hand to face touch.i')
+
+for (f in 1:2){
+  matrix.Dose[f,1]<-mean(Dose.b[f,])
+  matrix.Dose[f,2]<-sd(Dose.b[f,])
+  matrix.Dose[f,3]<-min(Dose.b[f,])
+  matrix.Dose[f,4]<-max(Dose.b[f,])
+  matrix.Dose[f,5]<-median(Dose.b[f,])
+}
+
+for (f in 1:2){
+  matrix.Dose[f+2,1]<-mean(Dose.i[f,])
+  matrix.Dose[f+2,2]<-sd(Dose.i[f,])
+  matrix.Dose[f+2,3]<-min(Dose.i[f,])
+  matrix.Dose[f+2,4]<-max(Dose.i[f,])
+  matrix.Dose[f+2,5]<-median(Dose.i[f,])
+}
+
+
+#Risk 
+matrix.Risk<-matrix(nrow=numevents*2, ncol=5)
+colnames(matrix.Risk)<-c('mean', 'sd', 'min', 'max', 'median')
+rownames(matrix.Risk)<-c('washer to dryer.b','hand to face touch.b','washer to dryer.i','hand to face touch.i')
+
+for (f in 1:2){
+  matrix.Risk[f,1]<-mean(Risk.b[f,])
+  matrix.Risk[f,2]<-sd(Risk.b[f,])
+  matrix.Risk[f,3]<-min(Risk.b[f,])
+  matrix.Risk[f,4]<-max(Risk.b[f,])
+  matrix.Risk[f,5]<-median(Risk.b[f,])
+}
+
+for (f in 1:2){
+  matrix.Risk[f+2,1]<-mean(Risk.i[f,])
+  matrix.Risk[f+2,2]<-sd(Risk.i[f,])
+  matrix.Risk[f+2,3]<-min(Risk.i[f,])
+  matrix.Risk[f+2,4]<-max(Risk.i[f,])
+  matrix.Risk[f+2,5]<-median(Risk.i[f,])
+}
+
+# Risk result by handwashing scenarios (copied from previous laundry code. not used for right now)
+#Risk, handwashing scenario 1 
+matrix.Risk.1<-matrix(nrow=8, ncol=4)
+colnames(matrix.Risk.1)<-c('mean', 'sd', 'min', 'max')
+rownames(matrix.Risk.1)<-c(1:8)
+
+for (f in 1:8){
+  matrix.Risk.1[f,1]<-mean(Risk.1[f,])
+  matrix.Risk.1[f,2]<-sd(Risk.1[f,])
+  matrix.Risk.1[f,3]<-min(Risk.1[f,])
+  matrix.Risk.1[f,4]<-max(Risk.1[f,])
+}
+
+#Pull out the data 
+library(openxlsx)
+write.csv(matrix.Conc.h, file="Conc.h.csv")
+write.csv(matrix.Conc.l, file="Conc.l.csv")
+write.csv(matrix.Dose, file="Dose.csv")
+write.csv(matrix.Risk, file="Risk.csv")
+##write.csv(matrix.Risk.1, file="Risk.1.csv")
+##write.csv(matrix.Risk.2,  file="Risk.2.csv")
+##write.csv(matrix.Risk.3, file="Risk.3.csv")
+
+
+
+
+######===================================================================#######============
 ##Hand washing scenario 1----------------------------------------------------
 
 #Matrix 

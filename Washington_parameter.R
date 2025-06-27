@@ -62,7 +62,7 @@ Conc.i.face<-0
 if(organism == "Influenza A") {  
   #Transfer efficiency
   TE.dry <-rtriangle(n=iterations, a=4.74E-05, b=4.94E-02, c=9.09E-04)
-  TE.wet <-rtriangle(n=iterations, a=6.77E-04, b=3.77E-02, c==7.32E-03)
+  TE.wet <-rtriangle(n=iterations, a=6.77E-04, b=3.77E-02, c=7.32E-03)
   TE.face<-rtrunc(iterations,"norm", mean=0.3390, sd=0.1318, a=0, b=1)
   
   #Reduction
@@ -70,6 +70,10 @@ if(organism == "Influenza A") {
   Reduc.wash.c <-2.34
   ##Reduc.dry <-rtrunc(iterations, "norm", mean=3.0, sd=0.02, a=0, b=5.0)
   ##Reduc.hwash<-runif(iterations, min=2.03, max=5.0)
+  
+  #Number of contacts
+  n.HF.wet<-n.HM.wet+n.HN.wet+n.HE.wet
+  n.HF.dry<-n.HM.dry+n.HN.dry+n.HE.dry
   
   #Initial concentration on laundry on Sunday
 
@@ -80,9 +84,15 @@ if(organism == "Influenza A") {
   Conc.i.laundry<-(Viralload*Volume.cough*Freq.cough.day)/(Conversion.ratio*A.laundry)
   
   #Dose response value 
+  
   alpha<-4.29E-01
   N50<-6.66E+05
   beta<-N50/(2^(1/alpha)-1)
+  
+  cal_risk<-function(dose) {
+    1-(1+(dose/beta))^(-alpha)  
+  }
+  
   
 } else if (organism == "E.faecium") 
 {
@@ -97,6 +107,9 @@ if(organism == "Influenza A") {
   ##Reduc.dry <-rtrunc(iterations, "norm", mean=6.9, sd=0.06, a=0, b=9.0)
   ##Reduc.hwash<-runif(iterations, min=0.14, max=4.32)
 
+  #Number of contacts
+  n.HF.wet<-n.HM.wet+n.HE.wet
+  n.HF.dry<-n.HM.dry+n.HE.dry
   
   #Initial concentration on laundry on Sunday
   Conc.feces <-runif(iterations,min=10^4, max=10^6)
@@ -106,6 +119,10 @@ if(organism == "Influenza A") {
   
   #Dose response value 
   k=2.19E-11
+  
+  cal_risk<-function(dose) {
+    1-exp(-dose/k)  }
+  
   
 } else { #E.coli 
   
@@ -120,6 +137,9 @@ if(organism == "Influenza A") {
   ##Reduc.dry <-rtrunc(iterations, "norm", mean=8.0, sd=0.93, a=0, b=10.0)
   ##Reduc.hwash<-runif(iterations, min=0.6, max=5.8)
   
+  #Number of contacts
+  n.HF.wet<-n.HM.wet
+  n.HF.dry<-n.HM.dry
   
   #Initial concentration on laundry on Sunday
   Conc.feces <-runif(iterations,min=10^7, max=10^9)
@@ -131,6 +151,10 @@ if(organism == "Influenza A") {
   alpha<-1.55E-01
   N50<-2.11E+06
   beta<-N50/(2^(1/alpha)-1)
+  
+  cal_risk<-function(dose) {
+    1-(1+(dose/beta))^(-alpha)  
+  }
   
 }
 
