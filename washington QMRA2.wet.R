@@ -167,12 +167,12 @@ for (org in organisms) {
 
 }
 
-#Summary Statistic extraction 
+#Summary Statistic extraction & save result CSV. files 
 library(dplyr)
 
 sum_by_micro_and_event <- function (df, value_name){
   df %>%
-    group_by(microorganism, event, scenario) %>%
+    group_by(microorganism, scenario, event) %>%
     summarize (
       mean = mean(value, na.rm=TRUE),
       sd = sd(value, na.rm=TRUE),
@@ -185,46 +185,32 @@ sum_by_micro_and_event <- function (df, value_name){
     select(microorganism, scenario, event, variable, everything())
 }
 
-summary_Conc_h<-sum_by_micro_and_event(Conc.h)
+
+summary_Conc_h<-sum_by_micro_and_event(Conc_h_all, "Conc.h")
+summary_Conc_l<-sum_by_micro_and_event(Conc_l_all, "Conc.l")
+summary_Dose<-sum_by_micro_and_event(Dose_all, "Dose")
+summary_Risk<-sum_by_micro_and_event(Risk_all, "Risk")
+
+write.csv(summary_Conc_h, "summary_Conc_h.csv", row.names = FALSE)
+write.csv(summary_Conc_l, "summary_Conc_l.csv", row.names = FALSE)
+write.csv(summary_Dose,   "summary_Dose.csv", row.names = FALSE)
+write.csv(summary_Risk,   "summary_Risk.csv", row.names = FALSE)
 
 
-#plotting--------need to update
+#plotting
 library(ggplot2)
 library(ggpubr)
 
-Conc.h.dataframe<-as.data.frame(t(Conc.h))
-Conc.l.dataframe<-as.data.frame(t(Conc.l))
-Dose.dataframe<-as.data.frame(t(Dose))
-Risk.dataframe<-as.data.frame(t(Risk))
-
-event<-rep(c(rep(1,iterations),rep(2,iterations),rep(3,iterations),rep(4,iterations),rep(5,iterations),rep(6,iterations),rep(7,iterations),rep(8,iterations)),4)
-type<-c(rep("Hand",8*iterations),rep("Laundry",8*iterations),rep("Dose",8*iterations),rep("Risk",8*iterations))
-value<-c(Conc.h.dataframe$`Hamper to washer`, Conc.h.dataframe$`Hand to face touch #1`,
-         Conc.h.dataframe$`between face touch and end of washing cycle`,Conc.h.dataframe $`Washer to dryer`, 
-         Conc.h.dataframe $`Hand to face touch #2`, Conc.h.dataframe $`Dry cycle`,
-         Conc.h.dataframe $`Dryer to folding area`,Conc.h.dataframe $`Hand to face touch #3`,
-         
-         Conc.l.dataframe$`Hamper to washer`, Conc.l.dataframe$`Hand to face touch #1`,
-         Conc.l.dataframe$`between face touch and end of washing cycle`,Conc.l.dataframe $`Washer to dryer`, 
-         Conc.l.dataframe $`Hand to face touch #2`, 
-         Conc.l.dataframe $`Dry cycle`,Conc.l.dataframe $`Dryer to folding area`,
-         Conc.l.dataframe $`Hand to face touch #3`,
-         
-         Dose.dataframe$`Hamper to washer`, Dose.dataframe$`Hand to face touch #1`,
-         Dose.dataframe$`between face touch and end of washing cycle`,Dose.dataframe $`Washer to dryer`,
-         Dose.dataframe $`Hand to face touch #2`, Dose.dataframe $`Dry cycle`,Dose.dataframe $`Dryer to folding area`,
-         Dose.dataframe $`Hand to face touch #3`,
-         
-         Risk.dataframe$`Hamper to washer`, Risk.dataframe$`Hand to face touch #1`,
-         Risk.dataframe$`between face touch and end of washing cycle`,Risk.dataframe $`Washer to dryer`,
-         Risk.dataframe $`Hand to face touch #2`, Risk.dataframe $`Dry cycle`,Risk.dataframe $`Dryer to folding area`,
-         Risk.dataframe $`Hand to face touch #3`)
-
-data<-data.frame(event,type,value)
+risk_result<-Risk_all %>% filter(event=="Hand to face touch")
 
 windows()
-ggplot(data)+geom_violin(aes(x=event,y=value,fill=type, group=event),alpha=0.3,draw_quantiles = c(0.25,0.5,0.75))+
-  facet_wrap(~type,scales="free") +
-  scale_y_continuous(trans="log10")
+ggplot(risk_result, aes(x=microorganism, y=value, fill=scenario))+
+  geom_violin (trim=FALSE,alpha=0.3,draw_quantiles = c(0.25,0.5,0.75))+
+  geom_boxplot(width =0.1, outlier.shape=NA, position=position_dodge(0.9))+
+  scale_y_continuous(trans="log10", breaks=c( 1e+1, 1e-2, 1e-5, 1e-8, 1e-11, 1e-14, 1e-17),
+                     label=c(1, -2, -5, -8, -11, -14, -17) ) +
+  labs(title="Infection risk during the transfer of wet laundry to the drying machine", x= "Pathogen", y="Infection Risk (log10)") #+
+  #facet_wrap(~microorganism,scales="free")
 
+ggsave("Risk_wet.tiff", dpi=600, dev='tiff', height=6, width=8, units="in")
 
