@@ -1,10 +1,10 @@
 # List of pathogens
 organisms <- c("E.coli", "E.faecium", "Influenza A")
 
-Conc_h_all <- data.frame()
-Conc_l_all <- data.frame()
-Dose_all   <- data.frame()
-Risk_all   <- data.frame()
+Conc_h_all.d <- data.frame()
+Conc_l_all.d <- data.frame()
+Dose_all.d   <- data.frame()
+Risk_all.d   <- data.frame()
 
 #For loop for changing organisms 
 
@@ -14,9 +14,9 @@ for (org in organisms) {
   
   ##Run simulation
   
-  ##Scenario 1. touching dry laundry to put it into washer -------------------
+  ##Scenario 1. touching dry laundry to transfer to washer -------------------
   numevents<-2
-  eventsname<-c("hamper to washer","Hand to face touch")
+  eventsname<-c("hamper to waser","Hand to face touch")
   
   Conc.h.b<-matrix(nrow=numevents,ncol=iterations)
   rownames(Conc.h.b)<-eventsname
@@ -30,7 +30,7 @@ for (org in organisms) {
   Risk.b<-matrix(nrow=numevents, ncol=iterations)
   rownames(Risk.b)<-eventsname
   
-  ###Event 1. transfer dry clothes to washer
+  ###Event 1. Loading dry clothes to washer
   Conc.h.current<-0
   Conc.l.current<-Conc.i.laundry
   
@@ -60,37 +60,41 @@ for (org in organisms) {
   Dose.b[2,]<-Dose
   Risk.b[2,]<-cal_risk(Dose.b[2,])
   
-  
-  
+
   
   ##Data pulling and wrapping as data.frame
   
-  Conc_h_all <- data.frame(
+  df_ch_b <- data.frame(
     value = as.vector(t(Conc.h.b)),
     event = rep(eventsname, each = iterations),
     microorganism = organism
   )
   
-
-  Conc_l_all <- data.frame(
+  Conc_h_all.d <- rbind(Conc_h_all.d, df_ch_b)
+  
+  df_cl_b <- data.frame(
     value = as.vector(t(Conc.l.b)),
     event = rep(eventsname, each = iterations),
     microorganism = organism
   )
   
+  Conc_l_all.d <- rbind(Conc_l_all.d, df_cl_b)
   
-  Dose_all <- data.frame(
+  df_dose_b <- data.frame(
     value = as.vector(t(Dose.b)),
     event = rep(eventsname, each = iterations),
     microorganism = organism
   )
   
-  Risk_all  <- data.frame(
+  Dose_all.d <- rbind(Dose_all.d, df_dose_b)
+  
+  df_risk_b <- data.frame(
     value = as.vector(t(Risk.b)),
     event = rep(eventsname, each = iterations),
     microorganism = organism
   )
   
+  Risk_all.d <- rbind(Risk_all.d, df_risk_b)
   
 }
 
@@ -113,32 +117,34 @@ sum_by_micro_and_event <- function (df, value_name){
 }
 
 
-summary_Conc_h<-sum_by_micro_and_event(Conc_h_all, "Conc.h")
-summary_Conc_l<-sum_by_micro_and_event(Conc_l_all, "Conc.l")
-summary_Dose<-sum_by_micro_and_event(Dose_all, "Dose")
-summary_Risk<-sum_by_micro_and_event(Risk_all, "Risk")
+summary_Conc_h.d<-sum_by_micro_and_event(Conc_h_all.d, "Conc.h")
+summary_Conc_l.d<-sum_by_micro_and_event(Conc_l_all.d, "Conc.l")
+summary_Dose.d<-sum_by_micro_and_event(Dose_all.d, "Dose")
+summary_Risk.d<-sum_by_micro_and_event(Risk_all.d, "Risk")
 
-write.csv(summary_Conc_h, "summary_Conc_h.dry.csv", row.names = FALSE)
-write.csv(summary_Conc_l, "summary_Conc_l.dry.csv", row.names = FALSE)
-write.csv(summary_Dose,   "summary_Dose.dry.csv", row.names = FALSE)
-write.csv(summary_Risk,   "summary_Risk.dry.csv", row.names = FALSE)
+write.csv(summary_Conc_h.d, "summary_Conc_h_d.csv", row.names = FALSE)
+write.csv(summary_Conc_l.d, "summary_Conc_l_d.csv", row.names = FALSE)
+write.csv(summary_Dose.d,   "summary_Dose_d.csv", row.names = FALSE)
+write.csv(summary_Risk.d,   "summary_Risk_d.csv", row.names = FALSE)
 
 
 #plotting
 library(ggplot2)
 library(ggpubr)
+library(scales)
 
-risk_result<-Risk_all %>% filter(event=="Hand to face touch")
+
+risk_result<-Risk_all.d %>% filter(event=="Hand to face touch")
 
 windows()
 ggplot(risk_result, aes(x=microorganism, y=value, fill=microorganism))+
   geom_violin (trim=FALSE,alpha=0.3,draw_quantiles = c(0.25,0.5,0.75))+
   geom_boxplot(width =0.1, outlier.shape=NA, position=position_dodge(0.9))+
-  scale_y_continuous(trans="log10" ) +
-  labs(title="Infection risk during the transfer of dry laundry to the drying machine", x= "Pathogen", y="Infection Risk (log10)") #+
+  scale_y_log10(breaks=c( 1e+1, 1e-2, 1e-5, 1e-8, 1e-11, 1e-14, 1e-17), labels = label_log(base=10, signed=NULL)) +
+  #scale_y_continuous(trans="log10" , breaks=c( 1e+1, 1e-2, 1e-5, 1e-8, 1e-11, 1e-14, 1e-17),label=c(1, -2, -5, -8, -11, -14, -17)) +
+  labs(title="Infection risk during the transfer of dry laundry to the washing machine", x= "Pathogen", y="Infection Risk") #+
 #facet_wrap(~microorganism,scales="free")
 
-ggsave("Risk_dry.tiff", dpi=600, dev='tiff', height=6, width=8, units="in")
 
-#, breaks=c( 1e+1, 1e-2, 1e-5, 1e-8, 1e-11, 1e-14, 1e-17),
-#label=c(1, -2, -5, -8, -11, -14, -17)
+ggsave("Risk_dry.v2.tiff", dpi=600, dev='tiff', height=6, width=6, units="in")
+

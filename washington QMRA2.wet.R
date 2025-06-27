@@ -207,9 +207,8 @@ windows()
 ggplot(risk_result, aes(x=microorganism, y=value, fill=scenario))+
   geom_violin (trim=FALSE,alpha=0.3,draw_quantiles = c(0.25,0.5,0.75))+
   geom_boxplot(width =0.1, outlier.shape=NA, position=position_dodge(0.9))+
-  scale_y_continuous(trans="log10", breaks=c( 1e+1, 1e-2, 1e-5, 1e-8, 1e-11, 1e-14, 1e-17),
-                     label=c(1, -2, -5, -8, -11, -14, -17) ) +
-  labs(title="Infection risk during the transfer of wet laundry to the drying machine", x= "Pathogen", y="Infection Risk (log10)") #+
+  scale_y_log10(breaks=c( 1e+1, 1e-2, 1e-5, 1e-8, 1e-11, 1e-14, 1e-17), labels = label_log(base=10, signed=NULL)) +
+  labs(title="Infection risk during the transfer of wet laundry to the drying machine", x= "Pathogen", y="Infection Risk") #+
   #facet_wrap(~microorganism,scales="free")
 
 ggsave("Risk_wet.tiff", dpi=600, dev='tiff', height=6, width=8, units="in")

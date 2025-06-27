@@ -65,7 +65,7 @@ if(organism == "Influenza A") {
   TE.wet <-rtriangle(n=iterations, a=6.77E-04, b=3.77E-02, c=7.32E-03)
   TE.face<-rtrunc(iterations,"norm", mean=0.3390, sd=0.1318, a=0, b=1)
   
-  #Reduction
+  #Reduction by laundry detergent
   Reduc.wash <-4
   Reduc.wash.c <-2.34
   ##Reduc.dry <-rtrunc(iterations, "norm", mean=3.0, sd=0.02, a=0, b=5.0)
@@ -94,8 +94,7 @@ if(organism == "Influenza A") {
   }
   
   
-} else if (organism == "E.faecium") 
-{
+} else if (organism == "E.faecium") {
   #Transfer efficiency
   TE.dry <-rtriangle(n=iterations, a=6.98E-05, b=3.29E-01, c=1.07E-03)
   TE.wet <-rtriangle(n=iterations, a=4.00E-04, b=6.58E-02, c=5.32E-03)
