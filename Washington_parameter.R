@@ -118,11 +118,11 @@ if(organism == "Influenza A") {
   Conc.i.laundry<-Conc.feces*Mass.feces/A.laundry
   
   #Dose response value 
-  k=2.19E-11
+  k=1/177
   
   cal_risk<-function(dose) {
-    1-exp(-dose/k)  }
-  
+    1-exp(-dose*k)  }
+
   
 } else { #E.coli 
   
