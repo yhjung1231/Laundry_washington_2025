@@ -1,0 +1,13 @@
+"microorganism","scenario","event","variable","mean","sd","min","max","median"
+"E.coli","Baseline","Hand to face touch","Dose",1516.10552949797,1995.60823411736,0.027872798794752,27367.4267609331,807.836932248677
+"E.coli","Baseline","Washer to dryer","Dose",0,0,0,0,0
+"E.coli","Intervention","Hand to face touch","Dose",0.132047271472382,0.173810211173277,2.42761929004007e-06,2.38360322595624,0.0703596554610414
+"E.coli","Intervention","Washer to dryer","Dose",0,0,0,0,0
+"E.faecium","Baseline","Hand to face touch","Dose",0.663277008759587,0.723512977277841,0.000740161854768737,7.2217142484087,0.423318860890665
+"E.faecium","Baseline","Washer to dryer","Dose",0,0,0,0,0
+"E.faecium","Intervention","Hand to face touch","Dose",1.95746922808697e-05,2.13523817415523e-05,2.18437249502e-08,0.000213127897222519,1.24930252808243e-05
+"E.faecium","Intervention","Washer to dryer","Dose",0,0,0,0,0
+"Influenza A","Baseline","Hand to face touch","Dose",16458.9692776515,1808933.82150524,1.44572630775914e-13,296986275.945234,0.00357259069108513
+"Influenza A","Baseline","Washer to dryer","Dose",0,0,0,0,0
+"Influenza A","Intervention","Hand to face touch","Dose",360.083013554105,39575.1599495357,3.16290453484973e-15,6497351.77352675,7.81597681203545e-05
+"Influenza A","Intervention","Washer to dryer","Dose",0,0,0,0,0

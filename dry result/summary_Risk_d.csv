@@ -1,0 +1,7 @@
+"microorganism","event","variable","mean","sd","min","max","median"
+"E.coli","Hand to face touch","Risk",0.0421783150111348,0.0403459583887372,6.65998337145979e-07,0.277797489985918,0.029765579365106
+"E.coli","hamper to waser","Risk",0,0,0,0,0
+"E.faecium","Hand to face touch","Risk",0.0793941685879505,0.0797099568196605,1.12236693208256e-05,0.599943109061476,0.0540159618756401
+"E.faecium","hamper to waser","Risk",0,0,0,0,0
+"Influenza A","Hand to face touch","Risk",0.0177755271446226,0.0935126897534493,0,0.998045675408661,2.95344991796398e-06
+"Influenza A","hamper to waser","Risk",0,0,0,0,0
