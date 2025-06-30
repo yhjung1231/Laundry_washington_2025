@@ -9,9 +9,19 @@ alpha <- 0.265 # should be updated
 N50 <- 5.597 #should be updated 
 
 
+# Fixed Parameters
+S_hl <- runif(n_iter, 0.13, 0.25) #fraction of hand surface in contact with laundry
+S_hm <- runif(n_iter, 0.008, 0.012) #fraction of hand surface in contact with mouth/facial areas
+A_h <- runif (n_iter, 445, 535) # total hand surface area (cm2)
+A_l <- runif (n_iter, 4.9E+3, 1.8E+4)
+H_hm <- 0.002
+H_fm <- 0.002
+
 # Set steps (step 1:loading laundry to washer/ step2: exposure after loading washer/ Step 3: loading laundry to dryer/ Step 4: exposure after loading dryer)
+##duration (second)
+
 steps <- list(
-  list(name = "Step 1", duration = 60, params = list(
+  list(name = "Step 1", duration = 64 , params = list(
     H_fh = function() rnorm(1, 0.02, 0.005),
     TE_fh = function() runif(1, 0.3, 0.4),
     TE_hf = function() runif(1, 0.2, 0.3),
@@ -49,12 +59,6 @@ steps <- list(
   ))
 )
 
-# 공통 면적 (고정)
-S_fh <- 3
-S_hm <- 3
-S_fm <- 3
-H_hm <- 0.002
-H_fm <- 0.002
 
 # 결과 저장
 results <- list()
